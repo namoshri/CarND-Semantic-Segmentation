@@ -106,7 +106,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     train_op = optimizer.minimize(cross_entropy_loss)
 
     return logits, train_op, cross_entropy_loss
-#tests.test_optimize(optimize)
+tests.test_optimize(optimize)
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
              correct_label, keep_prob, learning_rate):
@@ -123,7 +123,6 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
-    # TODO: Implement function
 
     print("Training model...")
     for epochs in range(epochs):
@@ -163,7 +162,6 @@ def run():
         # OPTIONAL: Augment Images for better results
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
-        # TODO: Build NN using load_vgg, layers, and optimize function
         l_in, keep_prob, l3_out, l4_out, l7_out = load_vgg(sess, vgg_path)
         output = layers(l3_out, l4_out, l7_out, num_classes)
         correct_label = tf.placeholder(tf.int32, shape=[None, None, None, num_classes])
@@ -172,21 +170,21 @@ def run():
 
         #save model
         saver = tf.train.Saver()
+        model_path = os.path.join(runs_dir, 'model.ckpt')
 
         # TODO: Train NN using the train_nn function or restore
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.global_variables_initializer()
         train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss,
-                l_in, correct_label, keep_prob, learning_rate)
+                 l_in, correct_label, keep_prob, learning_rate)
 
+        #saver.save(sess, model_path)
         #saver.restore(sess, model_path)
 
         # TODO: Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, l_in)
-        model_path = os.path.join(runs_dir, 'model.ckpt')
-        saver.save(sess, model_path)
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, l_in, is_video=False)
 
         # OPTIONAL: Apply the trained model to a video
-
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, l_in, is_video=True)
 
 if __name__ == '__main__':
     run()
